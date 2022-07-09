@@ -38,14 +38,19 @@ def log_in():
         user = u.username
         session['current_user'] = user
         return (user, 201)
-    else return ('Not Found', 303)
+    else: return ('Not Found', 303)
 
 @app.route("/check", methods=["GET"])
 def find_current_user():
     name = session['current_user']
 
     user = collection.find({'username': user})
+    user_obj = {
+        'username': user.username,
+        'email': user.email,
+        'first': user.first_name,
+        'last': user.last_name
+    }
     if name:
-        return (user['first_name'], 201)
-    else return ('Not Found', 303)
-
+        return (jsonify(user_obj), 201)
+    else: return ('Not Found', 303)
