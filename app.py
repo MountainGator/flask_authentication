@@ -1,3 +1,4 @@
+from urllib import response
 from flask import Flask, jsonify, request, session, redirect
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -6,11 +7,13 @@ from users import User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "urmom420"
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "localhost:3000"}})
 
 client = MongoClient('localhost', 27017)
 db = client.feedback_db
 collection = db.data
+
+session['current_user'] = ''
 
 @app.route("/register", methods=['POST'])
 def new_user():
@@ -33,28 +36,37 @@ def new_user():
 def log_in():
     json = request.json
 
-    u = collection.find({'username': json.username})
-    if u and bcrypt.check_password_hash(u.password, json.password):
-        user = u.username
+    u = collection.find_one({'username': json.username})
+
+    if u and bcrypt.check_password_hash(u['password'], json.password):
+        user = u['username']
         session['current_user'] = user
-        return (user, 201)
-    else: return ('Not Found', 303)
+        return (jsonify(msg=user), 201)
+    else: return (jsonify(msg='Not Found'), 303)
 
 @app.route("/check", methods=["GET"])
 def find_current_user():
     name = session['current_user']
-    if name: 
-        user = collection.find({'username': name})
-        user_obj = {
-            'username': user.username,
-            'email': user.email,
-            'first': user.first_name,
-            'last': user.last_name
-        }
-        if user:
-            return (jsonify(msg=user_obj), 201)
+    if name is not '':
+        user = collection.find_one({'username': name})
+        
+        if user['first_name']:
+            print('user', user)
+            user_obj = {
+                'username': user['username'],
+                'email': user['email'],
+                'first': user['first_name'],
+                'last': user['last_name']
+            }
+            response = jsonify(msg=user_obj)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return (response, 201)
         else:
-            return (jsonify(msg='Not Found'), 303)
+            response = jsonify(msg='Not Found')
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return (response, 303)
     else:
         print('no user')
-        return (jsonify(msg='Not Found'), 303)
+        response = jsonify(msg='Not Found')
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return (response, 303)
