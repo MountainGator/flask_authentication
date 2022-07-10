@@ -41,14 +41,14 @@ def log_in():
     if u and bcrypt.check_password_hash(u['password'], json.password):
         user = u['username']
         session['current_user'] = user
-        return (jsonify(msg=user), 201)
+        return (user, 201)
     else: return (jsonify(msg='Not Found'), 303)
 
 @app.route("/check", methods=["GET"])
 def find_current_user():
-    name = session['current_user']
-    if name is not '':
-        user = collection.find_one({'username': name})
+    
+    if session['current_user']:
+        user = collection.find_one({'username': session['current_user']})
         
         if user['first_name']:
             print('user', user)
