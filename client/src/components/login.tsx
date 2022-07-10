@@ -20,11 +20,11 @@ export default function Login () {
     }
 
     const handleSubmit: Function = () => {
-
+        checkPwd(formData);
     }
 
-    const checkPwd: Function = async (name: string, pwd: string) => {
-        let postbody: {[x: string]: string} = {username: name, password: pwd};
+    const checkPwd: Function = async ({username, password}: loginForm) => {
+        let postbody: {[x: string]: string} = {username: username, password: password};
         const res: any = await axios.post('http://localhost:5000/login', postbody);
         console.log(res)
         if(res.data.msg !== 'Not Found') {
