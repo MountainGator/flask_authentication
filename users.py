@@ -1,13 +1,14 @@
-import bcrypt
 
 class User():
-    
-    @classmethod
-    def register (cls, username, pwd, email, first, last):
-        hashed = bcrypt.generate_password_hash(pwd)
-        hashed_utf8 = hashed.decode('utf8')
+    def __init__ (self, username, pwd, email, first, last):
+        self.username = username
+        self.password = pwd
+        self.email = email
+        self.first = first
+        self.last = last
+    def register (self):
+        return({'username': self.username, "password": self.password, 'email': self.email, 'first': self.first, 'last': self.last})
 
-        return cls(username=username, password=hashed_utf8, email=email, first=first, last=last)
         
 
 

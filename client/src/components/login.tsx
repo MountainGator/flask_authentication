@@ -25,6 +25,7 @@ export default function Login () {
 
     const checkPwd: Function = async ({username, password}: loginForm) => {
         let postbody: {[x: string]: string} = {username: username, password: password};
+        console.log(postbody)
         const res: any = await axios.post('http://localhost:5000/login', postbody);
         console.log(res)
         if(res.data.msg !== 'Not Found') {
@@ -34,10 +35,10 @@ export default function Login () {
 
     return (
         <div className="container">
-            <form onSubmit={() => handleSubmit}>
-                <input type="text" name="username" id="username" placeholder="username" onChange={() => handleChange}/>
-                <input type="text" name="password" id="password" placeholder="password" onChange={() => handleChange}/>
-                <button type="submit">Login</button>
+            <form>
+                <input type="text" name="username" id="username" placeholder="username" onChange={(e) => setFormData({...formData, [e.target.id]: e.target.value})}/>
+                <input type="text" name="password" id="password" placeholder="password" onChange={(e) => setFormData({...formData, [e.target.id]: e.target.value})}/>
+                <button onClick={handleSubmit()}>Login</button>
             </form>
         </div>
     )
